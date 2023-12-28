@@ -1,0 +1,100 @@
+---
+title: "CO data analysis"
+output: pdf_document
+date: '2022-12-21'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(tidyverse)
+library(blandr)
+```
+
+## Import and check data
+
+```{r}
+codata <- read.csv("co_data.csv")
+head(codata); str(codata)
+```
+
+## Plot raw data
+
+  Dashed lines are 20% variation from unity
+
+```{r}
+p1 <- ggplot(data = codata, aes(x=td, y=iq_r))
+p1 + geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_abline(intercept = 0, slope = 1.2, linetype = "dashed") +
+  geom_abline(intercept = 0, slope = 0.8, linetype = "dashed") +
+  labs(x = "Thermodilution CO Measurement",
+       y= "IQ CO measurement - radial artery")
+
+p2 <- ggplot(data = codata, aes(x=td, y=iq_m))
+p2 + geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_abline(intercept = 0, slope = 1.2, linetype = "dashed") +
+  geom_abline(intercept = 0, slope = 0.8, linetype = "dashed") +
+  labs(x = "Thermodilution CO Measurement",
+       y= "IQ CO measurement - dorsal metatarsal artery")
+
+p3 <- ggplot(data = codata, aes(x=iq_r, y=iq_m))
+p3 + geom_point() +
+  geom_smooth(method = lm, linetype = 'dashed', color = 'black') +
+  geom_abline(intercept = 0, slope = 1)
+```
+
+## BA analysis for overall data
+  
+  Radial artery
+```{r}
+datr <- codata %>% drop_na('iq_r')
+blandr.draw(datr$td, datr$iq_r, ciDisplay = F)
+blandr.output.text(datr$td, datr$iq_r)
+```
+
+  And dorsal metatarsal...
+```{r}
+datm <- codata %>% drop_na('iq_m')
+blandr.draw(datm$td, datm$iq_m, ciDisplay = F)
+blandr.output.text(datm$td, datm$iq_m)
+```
+
+## Same analysis for initial normotensive state
+
+  Radial artery
+```{r}
+datr1 <- codata %>% drop_na('iq_r') %>% filter(time == 1)
+blandr.draw(datr1$td, datr1$iq_r, ciDisplay = F)
+blandr.output.text(datr1$td, datr1$iq_r)
+```
+
+  and dorsal metatarsal...
+```{r}
+datm1 <- codata %>% drop_na('iq_m') %>% filter(time == 1)
+blandr.draw(datm1$td, datm1$iq_m, ciDisplay = F)
+blandr.output.text(datm1$td, datm1$iq_m)
+```
+
+## Analysis of hypotensive state (time 2)
+
+  radial artery
+```{r}
+datr2 <- codata %>% drop_na('iq_r') %>% filter(time == 2)
+blandr.draw(datr2$td, datr2$iq_r, ciDisplay = F)
+blandr.output.text(datr2$td, datr2$iq_r)
+```
+
+  and dorsal metatarsal
+```{r}
+datm2 <- codata %>% drop_na('iq_m') %>% filter(time == 2)
+blandr.draw(datm2$td, datm2$iq_m, ciDisplay = F)
+blandr.output.text(datm2$td, datm2$iq_m)
+```
+
+# Code used to evaluate and graph the data
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```
+
